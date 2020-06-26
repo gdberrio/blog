@@ -2,7 +2,7 @@
 toc: true
 layout: post
 description: Small primer on Bayesian Hierarchical Models
-categories: [markdown]
+categories: [Bayesian Hierarchical Model, pyMC3]
 title: Hierarchical Models
 ---
 

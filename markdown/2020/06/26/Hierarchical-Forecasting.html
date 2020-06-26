@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Hierarchical Models | Widibeo’s Corner</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Hierarchical Models" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Small primer on Bayesian Hierarchical Models" />
+<meta property="og:description" content="Small primer on Bayesian Hierarchical Models" />
+<link rel="canonical" href="https://gdberrio.github.io/blog/markdown/2020/06/26/Hierarchical-Forecasting.html" />
+<meta property="og:url" content="https://gdberrio.github.io/blog/markdown/2020/06/26/Hierarchical-Forecasting.html" />
+<meta property="og:site_name" content="Widibeo’s Corner" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-06-26T00:00:00-05:00" />
+<script type="application/ld+json">
+{"datePublished":"2020-06-26T00:00:00-05:00","dateModified":"2020-06-26T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://gdberrio.github.io/blog/markdown/2020/06/26/Hierarchical-Forecasting.html"},"description":"Small primer on Bayesian Hierarchical Models","@type":"BlogPosting","url":"https://gdberrio.github.io/blog/markdown/2020/06/26/Hierarchical-Forecasting.html","headline":"Hierarchical Models","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://gdberrio.github.io/blog/feed.xml" title="Widibeo's Corner" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-115548470-1','auto');ga('require','displayfeatures');ga('send','pageview');</script>
+
+<link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Hierarchical Models | Widibeo’s Corner</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Hierarchical Models" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Small primer on Bayesian Hierarchical Models" />
+<meta property="og:description" content="Small primer on Bayesian Hierarchical Models" />
+<link rel="canonical" href="https://gdberrio.github.io/blog/markdown/2020/06/26/Hierarchical-Forecasting.html" />
+<meta property="og:url" content="https://gdberrio.github.io/blog/markdown/2020/06/26/Hierarchical-Forecasting.html" />
+<meta property="og:site_name" content="Widibeo’s Corner" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-06-26T00:00:00-05:00" />
+<script type="application/ld+json">
+{"datePublished":"2020-06-26T00:00:00-05:00","dateModified":"2020-06-26T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://gdberrio.github.io/blog/markdown/2020/06/26/Hierarchical-Forecasting.html"},"description":"Small primer on Bayesian Hierarchical Models","@type":"BlogPosting","url":"https://gdberrio.github.io/blog/markdown/2020/06/26/Hierarchical-Forecasting.html","headline":"Hierarchical Models","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://gdberrio.github.io/blog/feed.xml" title="Widibeo's Corner" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-115548470-1','auto');ga('require','displayfeatures');ga('send','pageview');</script>
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">Widibeo&#39;s Corner</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">About Me</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Hierarchical Models</h1><p class="page-description">Small primer on Bayesian Hierarchical Models</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-06-26T00:00:00-05:00" itemprop="datePublished">
+        Jun 26, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      3 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#markdown">markdown</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#hierarchical-models">Hierarchical Models</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#books">Books</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#forecasting-principles-and-practice---hierarchical-or-grouped-time-series">Forecasting: Principles and Practice - Hierarchical or Grouped Time Series</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#blog-posts">Blog Posts</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#bayesian-methods-for-multilevel-modelling">Bayesian Methods for Multilevel Modelling</a></li>
+<li class="toc-entry toc-h3"><a href="#hierarchical-linear-regression-in-pymc3">Hierarchical Linear Regression in PyMC3</a>
+<ul>
+<li class="toc-entry toc-h4"><a href="#introduction">Introduction</a></li>
+<li class="toc-entry toc-h4"><a href="#single-regression-pooled-model">Single regression (pooled model)</a></li>
+<li class="toc-entry toc-h4"><a href="#separate-regressions-unpooled-model">Separate regressions (unpooled model)</a></li>
+<li class="toc-entry toc-h4"><a href="#hierarchical-regression">Hierarchical Regression</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h3"><a href="#advanced-hierarchical-linear-regression-in-pymc3">Advanced Hierarchical Linear Regression in PyMC3</a></li>
+<li class="toc-entry toc-h3"><a href="#hddm-demo">HDDM Demo</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#tools">Tools</a></li>
+<li class="toc-entry toc-h2"><a href="#extra-notes">Extra Notes</a></li>
+</ul>
+</li>
+</ul><h1 id="hierarchical-models">
+<a class="anchor" href="#hierarchical-models" aria-hidden="true"><span class="octicon octicon-link"></span></a>Hierarchical Models</h1>
+
+<h2 id="books">
+<a class="anchor" href="#books" aria-hidden="true"><span class="octicon octicon-link"></span></a>Books</h2>
+
+<h3 id="forecasting-principles-and-practice---hierarchical-or-grouped-time-series">
+<a class="anchor" href="#forecasting-principles-and-practice---hierarchical-or-grouped-time-series" aria-hidden="true"><span class="octicon octicon-link"></span></a>Forecasting: Principles and Practice - Hierarchical or Grouped Time Series</h3>
+<blockquote>
+  <p><a href="https://otexts.com/fpp2/hierarchical.html">Forecasting: Principles and Practice - Chapter 10 Forecasting hierarchical or grouped time series</a></p>
+</blockquote>
+
+<h2 id="blog-posts">
+<a class="anchor" href="#blog-posts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Blog Posts</h2>
+
+<h3 id="bayesian-methods-for-multilevel-modelling">
+<a class="anchor" href="#bayesian-methods-for-multilevel-modelling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bayesian Methods for Multilevel Modelling</h3>
+<blockquote>
+  <p><a href="https://docs.pymc.io/notebooks/multilevel_modeling.html">A Primer on Bayesian Methods for Multilevel Modeling</a></p>
+</blockquote>
+
+<h3 id="hierarchical-linear-regression-in-pymc3">
+<a class="anchor" href="#hierarchical-linear-regression-in-pymc3" aria-hidden="true"><span class="octicon octicon-link"></span></a>Hierarchical Linear Regression in PyMC3</h3>
+<blockquote>
+  <p><a href="https://twiecki.io/blog/2014/03/17/bayesian-glms-3/">The best of both worlds: Hierarchical Linear Regression in PyMC3</a></p>
+</blockquote>
+
+<h4 id="introduction">
+<a class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction</h4>
+
+<p>Hierarchical modeling is especially advantageous when in the presence of multi-level data, making the most of all available information by it’s “shrinkage-effect”.
+Software like <a href="https://github.com/hddm-devs/hddm">HDDM</a> allows hierarchical Bayesian estimation of a widely used decision making model, but here we will use a classical example of hierarchical linear regression to predict <a href="#Bayesian-Methods-for-Multilevel-Modelling">radon levels in houses</a>.</p>
+
+<p>Gelman et al.’s (2007) radon dataset is the canonical example for Bayesian Hierarchical Modelling. In the dataset  the amount of radiation has been measured amongst different households in all counties of several US States. Radon gas is known as the highest cause of lung cancer in non-smokers. It is believed to enter the house through the basement. Additionally its concentration differs regionally due to differences in soil type.</p>
+
+<p>The exercise is to attempt to predict radon levels in different counties and where in the house it was measured.</p>
+
+<p>Data Source: radon.csv<br>
+Columns: <em><strong>county</strong></em>, <em><strong>log_radon</strong></em>, <em><strong>floor</strong></em><br>
+where floor = 0 is the basement, floor = 1 is the 1st floor, and so forth.</p>
+
+<h4 id="single-regression-pooled-model">
+<a class="anchor" href="#single-regression-pooled-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Single regression (pooled model)</h4>
+
+<p>A common way of solving this would be to pool all the data and estimate one regression to assess the influence of measurement across counties. The model would follow the following specification:</p>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mi>a</mi><mi>d</mi><mi>o</mi><msub><mi>n</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>c</mi></mrow></msub><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><mo>∗</mo><mi>f</mi><mi>l</mi><mi>o</mi><mi>o</mi><msub><mi>r</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>c</mi></mrow></msub><mo>+</mo><mi>ϵ</mi></mrow><annotation encoding="application/x-tex">radon_{i,c} = \alpha + \beta * floor_{i,c} + \epsilon</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.980548em;vertical-align:-0.286108em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">a</span><span class="mord mathdefault">d</span><span class="mord mathdefault">o</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span><span class="mpunct mtight">,</span><span class="mord mathdefault mtight">c</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.0037em;">α</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.05278em;">β</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.980548em;vertical-align:-0.286108em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault">o</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span><span class="mpunct mtight">,</span><span class="mord mathdefault mtight">c</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">ϵ</span></span></span></span></span>
+
+<p>where $i$ corresponds to the measurement, $c$ corresponds to the county and floor corresponds to which floor the measurement was made.
+We then estimate a <em>single</em> intercept and a <em>single</em> slope for all measurements over all counties. We are assuming that all the counties are exactly the same.</p>
+
+<h4 id="separate-regressions-unpooled-model">
+<a class="anchor" href="#separate-regressions-unpooled-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Separate regressions (unpooled model)</h4>
+
+<p>Imagine however we were interested, for instance, in seeing the differences in relationship (slope) or base-rates of radon (intercept) across counties.
+We could generate $n$ regressions, where $n$ is the number of counties. Such model would follow the following specification:</p>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mi>a</mi><mi>d</mi><mi>o</mi><msub><mi>n</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>c</mi></mrow></msub><mo>=</mo><msub><mi>α</mi><mi>c</mi></msub><mo>+</mo><msub><mi>β</mi><mi>c</mi></msub><mo>∗</mo><mi>f</mi><mi>l</mi><mi>o</mi><mi>o</mi><msub><mi>r</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>c</mi></mrow></msub><mo>+</mo><msub><mi>ϵ</mi><mi>c</mi></msub></mrow><annotation encoding="application/x-tex">radon_{i,c} = \alpha_c + \beta_c * floor_{i,c} + \epsilon_c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.980548em;vertical-align:-0.286108em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">a</span><span class="mord mathdefault">d</span><span class="mord mathdefault">o</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span><span class="mpunct mtight">,</span><span class="mord mathdefault mtight">c</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.73333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.0037em;">α</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:-0.0037em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.05278em;">β</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:-0.05278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.980548em;vertical-align:-0.286108em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault">o</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span><span class="mpunct mtight">,</span><span class="mord mathdefault mtight">c</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">ϵ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span>
+
+<p>Now, for every county $c$, we are estimating $\alpha_c$ and $\beta_c$, up to $n$ total counties.
+In this version, the upooled version, we assume the extreme opposite of the former model. Instead of assuming all counties are exactly the same, we are assuming they share no similarities between them.</p>
+
+<h4 id="hierarchical-regression">
+<a class="anchor" href="#hierarchical-regression" aria-hidden="true"><span class="octicon octicon-link"></span></a>Hierarchical Regression</h4>
+
+<p>There is a middle ground between a fully pooled model and an unpooled model. It’s a Hierarchical Model.<br>
+Specifically, while we may assume that while $\alpha$s and $\beta$s are different for each county, they all come from a common group distribution:</p>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>α</mi><mi>c</mi></msub><mo>∼</mo><mi mathvariant="script">N</mi><mo stretchy="false">(</mo><msub><mi>μ</mi><mi>α</mi></msub><mo separator="true">,</mo><msubsup><mi>σ</mi><mi>α</mi><mn>2</mn></msubsup><mo stretchy="false">)</mo><mspace linebreak="newline"></mspace><msub><mi>β</mi><mi>c</mi></msub><mo>∼</mo><mi mathvariant="script">N</mi><mo stretchy="false">(</mo><msub><mi>μ</mi><mi>β</mi></msub><mo separator="true">,</mo><msubsup><mi>σ</mi><mi>β</mi><mn>2</mn></msubsup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\alpha_c \sim \mathcal{N}(\mu_\alpha, \sigma^2_\alpha)
+\\
+\beta_c \sim \mathcal{N}(\mu_\beta, \sigma^2_\beta)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.0037em;">α</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:-0.0037em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.1141079999999999em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathcal" style="margin-right:0.14736em;">N</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">μ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.0037em;">α</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-2.4530000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.0037em;">α</span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.05278em;">β</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:-0.05278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.2472159999999999em;vertical-align:-0.383108em;"></span><span class="mord"><span class="mord mathcal" style="margin-right:0.14736em;">N</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">μ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361079999999999em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05278em;">β</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.864108em;"><span style="top:-2.4530000000000003em;margin-left:-0.03588em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05278em;">β</span></span></span><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.383108em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span>
+
+<p>Here the assumption is that the intercepts $\alpha$ and slopes $\beta$ all come from a normal distribution centered around their respective group mean $\mu$ with a certain standard deviation $\sigma^2$, values (posteriors) which we also estimate. 
+It is for this reason that such a model is named Multilevel or Hierarchical.</p>
+
+<p>Using Probabilistic Programming, with a framework like pyMC3,</p>
+
+<h3 id="advanced-hierarchical-linear-regression-in-pymc3">
+<a class="anchor" href="#advanced-hierarchical-linear-regression-in-pymc3" aria-hidden="true"><span class="octicon octicon-link"></span></a>Advanced Hierarchical Linear Regression in PyMC3</h3>
+<blockquote>
+  <p><a href="https://twiecki.io/blog/2017/02/08/bayesian-hierchical-non-centered/">Why hierarchical models are awesome, tricky, and Bayesian</a></p>
+</blockquote>
+
+<h3 id="hddm-demo">
+<a class="anchor" href="#hddm-demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>HDDM Demo</h3>
+<blockquote>
+  <p><a href="http://ski.clps.brown.edu/hddm_docs/tutorial_python.html">HDDM Demo</a></p>
+</blockquote>
+
+<h2 id="tools">
+<a class="anchor" href="#tools" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tools</h2>
+<blockquote>
+  <p><a href="https://github.com/CollinRooney12/htsprophet">htsprophet</a>
+<a href="https://github.com/hddm-devs/hddm">HDDM</a></p>
+</blockquote>
+
+<h2 id="extra-notes">
+<a class="anchor" href="#extra-notes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Extra Notes</h2>
+
+<p><a href="https://twiecki.github.io/blog/2013/08/12/bayesian-glms-1/">The Inference Button: Bayesian GLMs made easy with PyMC3</a><br>
+<a href="https://twiecki.github.io/blog/2013/08/27/bayesian-glms-2/">This world is far from Normal(ly distributed): Bayesian Robust Regression in PyMC3</a></p>
+
+  </div><a class="u-url" href="/blog/markdown/2020/06/26/Hierarchical-Forecasting.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>Personal Blog on Data Science and Economics</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/gdberrio" title="gdberrio"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://www.linkedin.com/in/guilhermediazberrio" title="guilhermediazberrio"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#linkedin"></use></svg></a></li><li><a rel="me" href="https://twitter.com/gberrio" title="gberrio"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
